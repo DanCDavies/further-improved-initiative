@@ -4,6 +4,7 @@ import { CombatantState } from "../../common/CombatantState";
 import { EncounterState } from "../../common/EncounterState";
 import { CombatantRow } from "./CombatantRow";
 import { InitiativeListHeader } from "./InitiativeListHeader";
+import { RestoreCombatants } from "./RestoreCombatants";
 
 export function InitiativeList(props: {
   encounterState: EncounterState<CombatantState>;
@@ -41,6 +42,7 @@ export function InitiativeList(props: {
           })}
         </tbody>
       </table>
+      <RestoreCombatants />
     </div>
   );
 }

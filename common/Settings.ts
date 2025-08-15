@@ -40,9 +40,11 @@ export interface Settings {
     DisplayCombatantColor: boolean;
     DisplayReactionTracker: boolean;
     PostCombatStats: PostCombatStatsOption;
+    DisplayRestoreCombatants: boolean;
   };
   PlayerView: PlayerViewSettings;
   PreloadedStatBlockSources: Record<string, boolean | undefined>;
+  PreloadedSpellSources: Record<string, boolean | undefined>;
   RecentItemIds: string[];
   Version: string;
 }
@@ -67,7 +69,8 @@ export function getDefaultSettings(): Settings {
       DisplayHPBar: false,
       DisplayCombatantColor: false,
       DisplayReactionTracker: false,
-      PostCombatStats: PostCombatStatsOption.None
+      PostCombatStats: PostCombatStatsOption.None,
+      DisplayRestoreCombatants: true
     },
     PlayerView: {
       ActiveCombatantOnTop: false,
@@ -97,6 +100,9 @@ export function getDefaultSettings(): Settings {
       CustomEncounterId: ""
     },
     PreloadedStatBlockSources: {
+      "wotc-srd": true
+    },
+    PreloadedSpellSources: {
       "wotc-srd": true
     },
     RecentItemIds: [],

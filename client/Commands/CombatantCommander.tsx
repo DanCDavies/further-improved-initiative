@@ -1,7 +1,7 @@
 import * as ko from "knockout";
 import * as React from "react";
 
-import { TagState } from "../../common/CombatantState";
+import { CombatantState, TagState } from "../../common/CombatantState";
 import { probablyUniqueString } from "../../common/Toolbox";
 import { Combatant } from "../Combatant/Combatant";
 import { CombatantDetails } from "../Combatant/CombatantDetails";
@@ -168,6 +168,14 @@ export class CombatantCommander {
       `${deletedCombatantNames.join(", ")} removed from encounter.`
     );
     Metrics.TrackEvent("CombatantsRemoved", { Names: deletedCombatantNames });
+  };
+
+  public FlushCombatants = () => {
+    this.tracker.Encounter.FlushCombatants();
+  };
+
+  public RestoreCombatants = () => {
+    this.tracker.Encounter.RestoreCombatants();
   };
 
   public Deselect = () => {
@@ -524,7 +532,7 @@ export class CombatantCommander {
         Id: probablyUniqueString()
       });
     });
-    
+
     this.tracker.EventLog.AddEvent(
       `${selectedCombatants.map(c => c.Name()).join(", ")} duplicated.`
     );

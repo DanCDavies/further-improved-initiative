@@ -72,6 +72,7 @@ export class TrackerViewModel {
   public LibraryManagerPane = ko.observable<LibraryType | null>(null);
   public ToggleLibraryManager = (): void => {
     if (this.LibraryManagerPane() === null) {
+      Metrics.TrackEvent("LibraryManagerOpened");
       this.LibraryManagerPane("StatBlocks");
     } else {
       this.LibraryManagerPane(null);
@@ -131,7 +132,9 @@ export class TrackerViewModel {
 
   public CombatantViewModels: ko.PureComputed<CombatantViewModel[]> =
     ko.pureComputed(() =>
-      this.Encounter.Combatants().map(this.buildCombatantViewModel)
+      this.Encounter.Combatants()
+        .filter(c => !c.IsPendingRemoval())
+        .map(this.buildCombatantViewModel)
     );
 
   public StatBlockEditorProps = ko.observable<StatBlockEditorProps>(null);
@@ -354,7 +357,7 @@ export class TrackerViewModel {
     axios.get<PatreonPost>("/whatsnew/").then(response => {
       const latestPost = response.data;
       this.EventLog.AddEvent(
-        `Welcome to Improved Initiative! Here's what's new: <a href="${latestPost.attributes.url}" target="_blank">${latestPost.attributes.title}</a>`
+        `Welcome to Improved Initiative! Here's what's new: [${latestPost.attributes.title}](${latestPost.attributes.url})`
       );
     });
   };

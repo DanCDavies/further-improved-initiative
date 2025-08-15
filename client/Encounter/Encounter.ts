@@ -251,6 +251,14 @@ export class Encounter {
   }
 
   public RemoveCombatant = (combatant: Combatant) => {
+    combatant.IsPendingRemoval(true);
+  };
+
+  private flushCombatant = (combatant: Combatant) => {
+    if (!combatant.IsPendingRemoval()) {
+      console.warn("Cannot flush combatant that is not pending removal");
+      return;
+    }
     this.combatants.remove(combatant);
 
     const removedCombatantName = combatant.StatBlock().Name;
@@ -268,6 +276,26 @@ export class Encounter {
 
     if (this.combatants().length == 0) {
       this.EncounterFlow.EndEncounter();
+    }
+  };
+
+  public CombatantsPendingRemove = ko.computed(() =>
+    this.combatants().filter(c => c.IsPendingRemoval())
+  );
+
+  public FlushCombatants = () => {
+    for (const combatant of this.combatants()) {
+      if (combatant.IsPendingRemoval()) {
+        this.flushCombatant(combatant);
+      }
+    }
+  };
+
+  public RestoreCombatants = () => {
+    for (const combatant of this.combatants()) {
+      if (combatant.IsPendingRemoval()) {
+        combatant.IsPendingRemoval(false);
+      }
     }
   };
 
@@ -347,7 +375,9 @@ export class Encounter {
         ActiveCombatantId: activeCombatant ? activeCombatant.Id : null,
         RoundCounter: this.EncounterFlow.CombatTimer.ElapsedRounds(),
         //ElapsedSeconds: omitted to avoid repeated re-renders,
-        Combatants: this.combatants().map<CombatantState>(c => c.GetState()),
+        Combatants: this.combatants()
+          .filter(c => !c.IsPendingRemoval())
+          .map<CombatantState>(c => c.GetState()),
         BackgroundImageUrl: this.TemporaryBackgroundImageUrl()
       };
     }
@@ -479,6 +509,10 @@ export class Encounter {
       if (c.Hidden()) {
         return false;
       }
+      if (c.IsPendingRemoval()) {
+        return false;
+      }
+
       if (
         hideMonstersOutsideEncounter &&
         this.EncounterFlow.State() == "inactive" &&
