@@ -55,6 +55,7 @@ export interface StatBlock extends Listable {
   LegendaryActions: NameAndContent[];
   BonusActions?: NameAndContent[];
   MythicActions?: NameAndContent[];
+  CustomFields?: NameAndContent[];
   Description: string;
   Player: string;
   ImageURL: string;

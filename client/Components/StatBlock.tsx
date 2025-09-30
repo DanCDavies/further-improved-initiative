@@ -9,6 +9,7 @@ import { useContext } from "react";
 import { LoadingIndicator } from "./LoadingIndicator";
 import ErrorBoundary from "./ErrorBoundary";
 import { DefaultRules } from "../Rules/Rules";
+import { SettingsContext } from "../Settings/SettingsContext";
 
 interface StatBlockProps {
   statBlock: StatBlock;
@@ -38,6 +39,7 @@ export function StatBlockComponent(props: StatBlockProps) {
 function StatBlockComponentNoError(props: StatBlockProps) {
   const textEnricher = useContext(TextEnricherContext);
   const rules = new DefaultRules();
+  const settings = useContext(SettingsContext);
 
   const statBlock = props.statBlock;
 
@@ -124,6 +126,24 @@ function StatBlockComponentNoError(props: StatBlockProps) {
           );
         })}
       </div>
+
+      {settings.StatBlock.CustomFields.length > 0 && (
+        <div className="custom-fields">
+          {settings.StatBlock.CustomFields.map(fieldSetting => {
+            const field = statBlock.CustomFields?.find(
+              f => f.Name === fieldSetting.name
+            );
+            return (
+              <div className="custom-field" key={fieldSetting.name}>
+                <span className="stat-label">{fieldSetting.name}</span>
+                <span className="stat-value">
+                  {field ? field.Content : fieldSetting.defaultValue}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       <hr />
 

@@ -22,6 +22,7 @@ import {
   ValueAndNotesField
 } from "./components/StatBlockEditorFields";
 import { TextField } from "./components/TextField";
+import { SettingsContext } from "../Settings/SettingsContext";
 
 export type StatBlockEditorTarget =
   | "library"
@@ -90,119 +91,157 @@ export class StatBlockEditor extends React.Component<
       </>
     );
 
-    const initialValues = {
-      ...this.props.statBlock,
-      StatBlockJSON: getAnonymizedStatBlockJSON(this.props.statBlock)
-    };
-
     return (
-      <Formik
-        onSubmit={this.saveAndClose}
-        initialValues={initialValues}
-        validate={this.validate}
-        validateOnBlur
-      >
-        {api => (
-          <Form
-            className="c-statblock-editor"
-            autoComplete="false"
-            translate="no"
-          >
-            <div className="c-statblock-editor__title-row">
-              <h2 className="c-statblock-editor__title">{header}</h2>
-              {buttons}
-            </div>
-            <div className="c-statblock-editor__identity">
-              <IdentityFields
-                formApi={api}
-                allowFolder={
-                  this.props.editorTarget === "library" ||
-                  this.props.editorTarget === "persistentcharacter"
+      <SettingsContext.Consumer>
+        {settings => {
+          const customFields = settings.StatBlock.CustomFields.map(
+            fieldSetting => {
+              const existingField = this.props.statBlock.CustomFields?.find(
+                f => f.Name == fieldSetting.name
+              );
+              return (
+                existingField || {
+                  Name: fieldSetting.name,
+                  Content: fieldSetting.defaultValue
                 }
-                allowSaveAsCopy={this.props.onSaveAsCopy !== undefined}
-                allowSaveAsCharacter={
-                  this.props.onSaveAsCharacter !== undefined
-                }
-                currentListings={this.props.currentListings}
-                setEditorMode={(editorMode: "standard" | "json") =>
-                  this.setState({ editorMode })
-                }
-              />
-            </div>
-            {this.state.editorMode == "standard"
-              ? this.fieldEditor(api)
-              : this.jsonEditor(api)}
-            <div className="c-statblock-editor__buttons">{buttons}</div>
-          </Form>
-        )}
-      </Formik>
+              );
+            }
+          );
+
+          const initialValues = {
+            ...this.props.statBlock,
+            CustomFields: customFields,
+            StatBlockJSON: getAnonymizedStatBlockJSON(this.props.statBlock)
+          };
+
+          return (
+            <Formik
+              onSubmit={this.saveAndClose}
+              initialValues={initialValues}
+              validate={this.validate}
+              validateOnBlur
+            >
+              {api => (
+                <Form
+                  className="c-statblock-editor"
+                  autoComplete="false"
+                  translate="no"
+                >
+                  <div className="c-statblock-editor__title-row">
+                    <h2 className="c-statblock-editor__title">{header}</h2>
+                    {buttons}
+                  </div>
+                  <div className="c-statblock-editor__identity">
+                    <IdentityFields
+                      formApi={api}
+                      allowFolder={
+                        this.props.editorTarget === "library" ||
+                        this.props.editorTarget === "persistentcharacter"
+                      }
+                      allowSaveAsCopy={this.props.onSaveAsCopy !== undefined}
+                      allowSaveAsCharacter={
+                        this.props.onSaveAsCharacter !== undefined
+                      }
+                      currentListings={this.props.currentListings}
+                      setEditorMode={(editorMode: "standard" | "json") =>
+                        this.setState({ editorMode })
+                      }
+                    />
+                  </div>
+                  {this.state.editorMode == "standard"
+                    ? this.fieldEditor(api)
+                    : this.jsonEditor(api)}
+                  <div className="c-statblock-editor__buttons">{buttons}</div>
+                </Form>
+              )}
+            </Formik>
+          );
+        }}
+      </SettingsContext.Consumer>
     );
   }
 
-  private fieldEditor = (api: FormikProps<any>) => (
-    <>
-      <div className="c-statblock-editor__headers">
-        <TextField label="Portrait URL" fieldName="ImageURL" />
-        <TextField label="Source" fieldName="Source" />
-        <TextField label="Type" fieldName="Type" />
-        {this.props.editorTarget == "persistentcharacter" && (
-          <EnumToggle
-            labelsByOption={{
-              "": "Non Player Character",
-              player: "Player Character"
-            }}
-            fieldName="Player"
+  private fieldEditor = (api: FormikProps<any>) => {
+    const settings = React.useContext(SettingsContext);
+    return (
+      <>
+        <div className="c-statblock-editor__headers">
+          <TextField label="Portrait URL" fieldName="ImageURL" />
+          <TextField label="Source" fieldName="Source" />
+          <TextField label="Type" fieldName="Type" />
+          {this.props.editorTarget == "persistentcharacter" && (
+            <EnumToggle
+              labelsByOption={{
+                "": "Non Player Character",
+                player: "Player Character"
+              }}
+              fieldName="Player"
+            />
+          )}
+        </div>
+        <div className="c-statblock-editor__stats">
+          <TextField
+            label={
+              this.props.statBlock.Player == "player" ? "Level" : "Challenge"
+            }
+            fieldName="Challenge"
           />
-        )}
-      </div>
-      <div className="c-statblock-editor__stats">
-        <TextField
-          label={
-            this.props.statBlock.Player == "player" ? "Level" : "Challenge"
-          }
-          fieldName="Challenge"
-        />
-        <ValueAndNotesField label="Hit Points" fieldName="HP" />
-        <ValueAndNotesField label="Armor Class" fieldName="AC" />
-        <InitiativeField />
-      </div>
-      <div className="c-statblock-editor__abilityscores">
-        {StatBlock.AbilityNames.map(abilityScoreField)}
-      </div>
-      <div className="c-statblock-editor__saves">
-        <NameAndModifierFields api={api} modifierType="Saves" />
-      </div>
-      <div className="c-statblock-editor__skills">
-        <NameAndModifierFields api={api} modifierType="Skills" />
-      </div>
-      {[
-        "Speed",
-        "Senses",
-        "DamageVulnerabilities",
-        "DamageResistances",
-        "DamageImmunities",
-        "ConditionImmunities",
-        "Languages"
-      ].map(keywordType => (
-        <div key={keywordType} className="c-statblock-editor__keywords">
-          <KeywordFields api={api} keywordType={keywordType} />
+          <ValueAndNotesField label="Hit Points" fieldName="HP" />
+          <ValueAndNotesField label="Armor Class" fieldName="AC" />
+          <InitiativeField />
         </div>
-      ))}
-      {[
-        "Traits",
-        "Actions",
-        "BonusActions",
-        "Reactions",
-        "LegendaryActions",
-        "MythicActions"
-      ].map(powerType => (
-        <div key={powerType} className="c-statblock-editor__powers">
-          <PowerFields api={api} powerType={powerType} />
+        <div className="c-statblock-editor__abilityscores">
+          {StatBlock.AbilityNames.map(abilityScoreField)}
         </div>
-      ))}
-      <DescriptionField />
-    </>
-  );
+        <div className="c-statblock-editor__custom-fields">
+          {settings.StatBlock.CustomFields.map(fieldSetting => {
+            const fieldIndex = api.values.CustomFields?.findIndex(
+              f => f.Name == fieldSetting.name
+            );
+            return (
+              <TextField
+                key={fieldSetting.name}
+                label={fieldSetting.name}
+                fieldName={`CustomFields[${fieldIndex}].Content`}
+              />
+            );
+          })}
+        </div>
+        <div className="c-statblock-editor__saves">
+          <NameAndModifierFields api={api} modifierType="Saves" />
+        </div>
+        <div className="c-statblock-editor__skills">
+          <NameAndModifierFields api={api} modifierType="Skills" />
+        </div>
+        {[
+          "Speed",
+          "Senses",
+          "DamageVulnerabilities",
+          "DamageResistances",
+          "DamageImmunities",
+          "ConditionImmunities",
+          "Languages"
+        ].map(keywordType => (
+          <div key={keywordType} className="c-statblock-editor__keywords">
+            <KeywordFields api={api} keywordType={keywordType} />
+          </div>
+        ))}
+        {[
+          "Traits",
+          "Actions",
+          "BonusActions",
+          "Reactions",
+          "LegendaryActions",
+          "MythicActions"
+        ].map(powerType => (
+          <div key={powerType} className="c-statblock-editor__powers">
+            <PowerFields api={api} powerType={powerType} />
+          </div>
+        ))}
+        <DescriptionField />
+      </>
+    );
+  };
 
   private jsonEditor = api => (
     <div className="c-statblock-editor__json-section">

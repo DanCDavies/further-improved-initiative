@@ -20,6 +20,13 @@ export enum PostCombatStatsOption {
   Both = "Both"
 }
 
+export type CustomStatBlockField = {
+  name: string;
+  type: "string";
+  showInCombatantRow: boolean;
+  defaultValue: string;
+};
+
 export interface Settings {
   Commands: CommandSetting[];
   Rules: {
@@ -43,6 +50,9 @@ export interface Settings {
     DisplayRestoreCombatants: boolean;
   };
   PlayerView: PlayerViewSettings;
+  StatBlock: {
+    CustomFields: CustomStatBlockField[];
+  };
   PreloadedStatBlockSources: Record<string, boolean | undefined>;
   PreloadedSpellSources: Record<string, boolean | undefined>;
   RecentItemIds: string[];
@@ -98,6 +108,10 @@ export function getDefaultSettings(): Settings {
         backgroundUrl: ""
       },
       CustomEncounterId: ""
+    },
+    StatBlock: {
+      CustomFields: [
+      ]
     },
     PreloadedStatBlockSources: {
       "wotc-srd": true
