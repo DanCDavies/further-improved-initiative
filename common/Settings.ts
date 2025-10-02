@@ -110,8 +110,7 @@ export function getDefaultSettings(): Settings {
       CustomEncounterId: ""
     },
     StatBlock: {
-      CustomFields: [
-      ]
+      CustomFields: []
     },
     PreloadedStatBlockSources: {
       "wotc-srd": true
