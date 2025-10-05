@@ -193,20 +193,23 @@ export class StatBlockEditor extends React.Component<
         <div className="c-statblock-editor__abilityscores">
           {StatBlock.AbilityNames.map(abilityScoreField)}
         </div>
-        <div className="c-statblock-editor__custom-fields">
-          {settings.StatBlock.CustomFields.map(fieldSetting => {
-            const fieldIndex = api.values.CustomFields?.findIndex(
-              f => f.Name == fieldSetting.name
-            );
-            return (
-              <TextField
-                key={fieldSetting.name}
-                label={fieldSetting.name}
-                fieldName={`CustomFields[${fieldIndex}].Content`}
-              />
-            );
-          })}
-        </div>
+        {settings.StatBlock.CustomFields.length > 0 && (
+          <div className="c-statblock-editor__custom-fields">
+            <h2>Custom Fields</h2>
+            {settings.StatBlock.CustomFields.map(fieldSetting => {
+              const fieldIndex = api.values.CustomFields?.findIndex(
+                f => f.Name == fieldSetting.name
+              );
+              return (
+                <TextField
+                  key={fieldSetting.name}
+                  label={fieldSetting.name}
+                  fieldName={`CustomFields[${fieldIndex}].Content`}
+                />
+              );
+            })}
+          </div>
+        )}
         <div className="c-statblock-editor__saves">
           <NameAndModifierFields api={api} modifierType="Saves" />
         </div>
