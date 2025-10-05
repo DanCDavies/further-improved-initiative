@@ -14,7 +14,17 @@ export const StatBlockCustomFields = () => {
               <div key={index} className="custom-field">
                 <div className="c-input-with-label">
                   Field Name
-                  <Field name={`StatBlock.CustomFields.${index}.name`} />
+                  <Field
+                    name={`StatBlock.CustomFields.${index}.name`}
+                    autocomplete="off"
+                  />
+                </div>
+                <div className="c-input-with-label">
+                  Default Value
+                  <Field
+                    name={`StatBlock.CustomFields.${index}.defaultValue`}
+                    autocomplete="off"
+                  />
                 </div>
                 <div className="c-input-with-label">
                   Display in Combatant Row
@@ -26,12 +36,14 @@ export const StatBlockCustomFields = () => {
                   Combatant Row Header
                   <Field
                     name={`StatBlock.CustomFields.${index}.combatantRowHeader`}
+                    autocomplete="off"
                   />
                 </div>
                 <div className="c-input-with-label">
                   Combatant Row Width
                   <Field
                     name={`StatBlock.CustomFields.${index}.combatantRowWidth`}
+                    autocomplete="off"
                     type="number"
                   />
                 </div>
@@ -40,6 +52,7 @@ export const StatBlockCustomFields = () => {
                   onClick={() => arrayHelpers.remove(index)}
                   text="Remove"
                 />
+                <hr />
               </div>
             )
           )}
