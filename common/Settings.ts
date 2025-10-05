@@ -25,6 +25,8 @@ export type CustomStatBlockField = {
   type: "string";
   showInCombatantRow: boolean;
   defaultValue: string;
+  combatantRowHeader?: string;
+  combatantRowWidth?: number;
 };
 
 export interface Settings {

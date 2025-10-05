@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Field, FieldArray, FieldProps } from "formik";
 import { Button } from "../../Components/Button";
+import { Toggle } from "./Toggle";
 
 export const StatBlockCustomFields = () => {
   return (
@@ -14,12 +15,31 @@ export const StatBlockCustomFields = () => {
                 <div className="c-input-with-label">
                   Field Name
                   <Field name={`StatBlock.CustomFields.${index}.name`} />
-                  <Button
-                    type="button"
-                    onClick={() => arrayHelpers.remove(index)}
-                    text="Remove"
+                </div>
+                <div className="c-input-with-label">
+                  Display in Combatant Row
+                  <Toggle
+                    fieldName={`StatBlock.CustomFields.${index}.showInCombatantRow`}
                   />
                 </div>
+                <div className="c-input-with-label">
+                  Combatant Row Header
+                  <Field
+                    name={`StatBlock.CustomFields.${index}.combatantRowHeader`}
+                  />
+                </div>
+                <div className="c-input-with-label">
+                  Combatant Row Width
+                  <Field
+                    name={`StatBlock.CustomFields.${index}.combatantRowWidth`}
+                    type="number"
+                  />
+                </div>
+                <Button
+                  type="button"
+                  onClick={() => arrayHelpers.remove(index)}
+                  text="Remove"
+                />
               </div>
             )
           )}

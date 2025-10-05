@@ -1,11 +1,14 @@
 import Tippy from "@tippyjs/react";
 import * as React from "react";
+import { SettingsContext } from "../Settings/SettingsContext";
 
 export function InitiativeListHeader(props: { encounterActive: boolean }) {
   const encounterStateIcon = props.encounterActive ? "fa-play" : "fa-pause";
   const encounterStateTip = props.encounterActive
     ? "Encounter Active"
     : "Encounter Inactive";
+
+  const settings = React.useContext(SettingsContext);
 
   return (
     <thead className="combatant--header">
@@ -46,6 +49,22 @@ export function InitiativeListHeader(props: { encounterActive: boolean }) {
             aria-hidden="true"
           ></span>
         </th>
+
+        {settings.StatBlock.CustomFields.filter(f => f.showInCombatantRow).map(
+          (field, index) => (
+            <th
+              key={index}
+              className="combatant__custom-field"
+              style={{
+                width: field.combatantRowWidth
+                  ? field.combatantRowWidth + "px"
+                  : "20px"
+              }}
+            >
+              {field.combatantRowHeader || field.name}
+            </th>
+          )
+        )}
 
         <th align="right">
           <span className="screen-reader-only">Tags and commands</span>
