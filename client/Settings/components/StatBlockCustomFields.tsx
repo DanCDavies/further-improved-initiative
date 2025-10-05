@@ -49,8 +49,10 @@ export const StatBlockCustomFields = () => {
               arrayHelpers.push({
                 name: "",
                 type: "string",
-                showInCombatantRow: true,
-                defaultValue: ""
+                defaultValue: "",
+                showInCombatantRow: false,
+                combatantRowHeader: "",
+                combatantRowWidth: 20
               })
             }
             text="Add Custom Field"
