@@ -23,7 +23,7 @@ export enum PostCombatStatsOption {
 export type CustomStatBlockField = {
   name: string;
   type: "string";
-  showInCombatantRow: boolean;
+  showInEncounterView: boolean;
   defaultValue: string;
   combatantRowHeader?: string;
   combatantRowWidth?: number;

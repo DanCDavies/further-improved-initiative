@@ -50,7 +50,7 @@ export function InitiativeListHeader(props: { encounterActive: boolean }) {
           ></span>
         </th>
 
-        {settings.StatBlock.CustomFields.filter(f => f.showInCombatantRow).map(
+        {settings.StatBlock.CustomFields.filter(f => f.showInEncounterView).map(
           (field, index) => (
             <th
               key={index}

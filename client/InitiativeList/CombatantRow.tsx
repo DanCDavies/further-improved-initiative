@@ -179,7 +179,7 @@ export function CombatantRow(props: CombatantRowProps) {
         )}
       </td>
 
-      {settings.StatBlock.CustomFields.filter(f => f.showInCombatantRow).map(
+      {settings.StatBlock.CustomFields.filter(f => f.showInEncounterView).map(
         field => (
           <td
             key={field.name}

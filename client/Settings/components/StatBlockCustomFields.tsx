@@ -2,6 +2,7 @@ import * as React from "react";
 import { Field, FieldArray, FieldProps } from "formik";
 import { Button } from "../../Components/Button";
 import { Toggle } from "./Toggle";
+import { Info } from "../../Components/Info";
 
 export const StatBlockCustomFields = () => {
   return (
@@ -27,20 +28,23 @@ export const StatBlockCustomFields = () => {
                   />
                 </div>
                 <div className="c-input-with-label">
-                  Display in Combatant Row
+                  <span>
+                    Display in Encounter View
+                    <Info>Show the field inline in the combatant row</Info>
+                  </span>
                   <Toggle
-                    fieldName={`StatBlock.CustomFields.${index}.showInCombatantRow`}
+                    fieldName={`StatBlock.CustomFields.${index}.showInEncounterView`}
                   />
                 </div>
                 <div className="c-input-with-label">
-                  Combatant Row Header
+                  Column Header
                   <Field
                     name={`StatBlock.CustomFields.${index}.combatantRowHeader`}
                     autocomplete="off"
                   />
                 </div>
                 <div className="c-input-with-label">
-                  Combatant Row Width
+                  Column Width (px)
                   <Field
                     name={`StatBlock.CustomFields.${index}.combatantRowWidth`}
                     autocomplete="off"
@@ -63,7 +67,7 @@ export const StatBlockCustomFields = () => {
                 name: "",
                 type: "string",
                 defaultValue: "",
-                showInCombatantRow: false,
+                showInEncounterView: false,
                 combatantRowHeader: "",
                 combatantRowWidth: 20
               })
