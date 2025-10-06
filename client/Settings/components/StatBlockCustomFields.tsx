@@ -18,14 +18,14 @@ export const StatBlockCustomFields = () => {
                   Field Name
                   <Field
                     name={`StatBlock.CustomFields.${index}.name`}
-                    autocomplete="off"
+                    autoComplete="off"
                   />
                 </div>
                 <div className="c-input-with-label">
                   Default Value
                   <Field
                     name={`StatBlock.CustomFields.${index}.defaultValue`}
-                    autocomplete="off"
+                    autoComplete="off"
                   />
                 </div>
                 <div className="c-input-with-label">
@@ -41,14 +41,14 @@ export const StatBlockCustomFields = () => {
                   Column Header
                   <Field
                     name={`StatBlock.CustomFields.${index}.combatantRowHeader`}
-                    autocomplete="off"
+                    autoComplete="off"
                   />
                 </div>
                 <div className="c-input-with-label">
                   Column Width (px)
                   <Field
                     name={`StatBlock.CustomFields.${index}.combatantRowWidth`}
-                    autocomplete="off"
+                    autoComplete="off"
                     type="number"
                   />
                 </div>
