@@ -51,11 +51,13 @@ export const StatBlockCustomFields = () => {
                     type="number"
                   />
                 </div>
-                <Button
-                  type="button"
-                  onClick={() => arrayHelpers.remove(index)}
-                  text="Remove"
-                />
+                <div className="c-button-with-label">
+                  Delete Custom Field
+                  <Button
+                    fontAwesomeIcon="trash"
+                    onClick={() => arrayHelpers.remove(index)}
+                  />
+                </div>
                 <hr />
               </div>
             )
