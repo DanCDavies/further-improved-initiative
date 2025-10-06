@@ -3,6 +3,7 @@ import { Field, FieldArray, FieldProps } from "formik";
 import { Button } from "../../Components/Button";
 import { Toggle } from "./Toggle";
 import { Info } from "../../Components/Info";
+import { Metrics } from "../../Utility/Metrics";
 
 export const StatBlockCustomFields = () => {
   return (
@@ -64,16 +65,17 @@ export const StatBlockCustomFields = () => {
           )}
           <Button
             type="button"
-            onClick={() =>
-              arrayHelpers.push({
+            onClick={() => {
+              Metrics.TrackEvent("CustomStatBlockFieldAdded");
+              return arrayHelpers.push({
                 name: "",
                 type: "string",
                 defaultValue: "",
                 showInEncounterView: false,
                 combatantRowHeader: "",
                 combatantRowWidth: 20
-              })
-            }
+              });
+            }}
             text="Add Custom Field"
           />
         </div>
