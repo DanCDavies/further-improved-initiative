@@ -28,12 +28,13 @@ export function CombatantRow(props: CombatantRowProps) {
   const displayName = getDisplayName(props);
   const commandContext = React.useContext(CommandContext);
 
+  const settings = React.useContext(SettingsContext);
   const {
     DisplayPortraits,
     DisplayHPBar,
     DisplayCombatantColor,
     DisplayReactionTracker
-  } = React.useContext(SettingsContext).TrackerView;
+  } = settings.TrackerView;
 
   const { combatantState, isSelected, isActive } = props;
   const { StatBlock } = combatantState;
@@ -177,6 +178,24 @@ export function CombatantRow(props: CombatantRowProps) {
           </Tippy>
         )}
       </td>
+
+      {settings.StatBlock.CustomFields.filter(f => f.showInEncounterView).map(
+        field => (
+          <td
+            key={field.name}
+            className="combatant__custom-field"
+            style={{
+              width: field.combatantRowWidth
+                ? field.combatantRowWidth + "px"
+                : undefined
+            }}
+          >
+            {props.combatantState.StatBlock.CustomFields?.find(
+              f => f.Name === field.name
+            )?.Content || field.defaultValue}
+          </td>
+        )
+      )}
 
       <td className="combatant__tags-commands-cell">
         <div className="combatant__tags-commands-wrapper">

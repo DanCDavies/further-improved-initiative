@@ -5,6 +5,7 @@ import { Info } from "../../Components/Info";
 import { env } from "../../Environment";
 import { StylesChooser } from "./StylesChooser";
 import { Toggle } from "./Toggle";
+import { StatBlockCustomFields } from "./StatBlockCustomFields";
 
 export function EpicInitiativeSettings() {
   if (!env.IsLoggedIn) {
@@ -83,6 +84,7 @@ export function EpicInitiativeSettings() {
         </Info>
       </h4>
       <Field component="textarea" rows={10} name="PlayerView.CustomCSS" />
+      <StatBlockCustomFields />
     </div>
   );
 }
