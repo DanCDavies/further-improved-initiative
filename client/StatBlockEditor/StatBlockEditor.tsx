@@ -97,7 +97,7 @@ export class StatBlockEditor extends React.Component<
           const customFields = settings.StatBlock.CustomFields.map(
             fieldSetting => {
               const existingField = this.props.statBlock.CustomFields?.find(
-                f => f.Name == fieldSetting.name
+                f => f.Name === fieldSetting.name
               );
               return (
                 existingField || {
@@ -198,7 +198,7 @@ export class StatBlockEditor extends React.Component<
             <h2>Custom Fields</h2>
             {settings.StatBlock.CustomFields.map(fieldSetting => {
               const fieldIndex = api.values.CustomFields?.findIndex(
-                f => f.Name == fieldSetting.name
+                f => f.Name === fieldSetting.name
               );
               return (
                 <TextField
