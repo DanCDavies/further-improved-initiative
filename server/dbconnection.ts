@@ -38,6 +38,11 @@ export async function upsertUser(
     throw "No mongo client initialized";
   }
 
+  const currentDate = new Date();
+  const mostRecentLogin = currentDate;
+  const mostRecentLoginWithPaidAccount =
+    accountStatus !== AccountStatus.None ? currentDate : null;
+
   const db = mongoClient.db();
   const users = await db.collection<User>("users");
   const result = await users.findOneAndUpdate(
@@ -48,7 +53,9 @@ export async function upsertUser(
       $set: {
         patreonId,
         accountStatus,
-        emailAddress
+        emailAddress,
+        mostRecentLogin,
+        mostRecentLoginWithPaidAccount
       },
       $setOnInsert: {
         statblocks: {},
