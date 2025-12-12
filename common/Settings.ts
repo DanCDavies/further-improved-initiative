@@ -115,7 +115,8 @@ export function getDefaultSettings(): Settings {
       CustomFields: []
     },
     PreloadedStatBlockSources: {
-      "wotc-srd": true
+      "wotc-srd": true,
+      "srd-2024": true
     },
     PreloadedSpellSources: {
       "wotc-srd": true
