@@ -14,7 +14,7 @@ import { Library, useLibrary } from "./useLibrary";
 import { Listable, ListingMeta } from "../../common/Listable";
 import {
   ImportOpen5eSpell,
-  ImportOpen5eStatBlock
+  ImportOpen5eV2StatBlock
 } from "../Importers/Open5eImporter";
 import { Settings } from "../../common/Settings";
 
@@ -172,8 +172,10 @@ async function preloadStatBlocks(
       const open5eListings: ListingMeta[] = response.data;
       StatBlocks.AddListings(
         open5eListings,
-        sourceSlug === "wotc-srd" ? "open5e" : "open5e-additional",
-        ImportOpen5eStatBlock
+        ["wotc-srd", "srd-2014", "srd-2024"].includes(sourceSlug)
+          ? "open5e"
+          : "open5e-additional",
+        ImportOpen5eV2StatBlock
       );
     } catch (error) {
       console.warn(`Problem loading StatBlocks from ${sourceSlug}: ${error}`);

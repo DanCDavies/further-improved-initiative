@@ -28,11 +28,11 @@ export async function configureOpen5eContent(
   }
 
   const includeMonsterFields =
-    "name,slug,size,type,subtype,alignment,challenge_rating,document__title,document__slug";
+    "name,key,size,type,alignment,challenge_rating,document";
   const includeSpellFields =
     "name,slug,level,school,document__title,document__slug";
 
-  const monstersSourceUrl = `https://api.open5e.com/monsters/?limit=500&fields=${includeMonsterFields}`;
+  const monstersSourceUrl = `https://api.open5e.com/v2/creatures/?limit=500&fields=${includeMonsterFields}`;
   const spellsSourceUrl = `https://api.open5e.com/spells/?limit=500&fields=${includeSpellFields}`;
 
   console.log("Loading Open5e monsters");
@@ -94,7 +94,7 @@ async function getAllListings(
       const response = await axios.get(nextUrl);
       const newListingsBySlug = _.groupBy(
         response.data.results,
-        r => r.document__slug as string
+        r => (r.document__slug as string) ?? (r.document.key as string)
       );
       totalLoaded += response.data.results.length;
 
@@ -122,18 +122,18 @@ async function getAllListings(
 
 function getMetaForMonster(r: any): ListingMeta {
   const listingMeta: ListingMeta = {
-    Id: "open5e-" + r.slug,
+    Id: "open5e-" + r.key,
     Name: r.name,
     Path: "",
-    Link: `https://api.open5e.com/monsters/${r.slug}`,
+    Link: `https://api.open5e.com/v2/creatures/${r.key}`,
     LastUpdateMs: 0,
-    SearchHint: `${r.name} ${r.type} ${r.subtype} ${r.alignment}`
+    SearchHint: `${r.name} ${r.type.name} ${r.alignment}`
       .toLocaleLowerCase()
       .replace(/[^\w\s]/g, ""),
     FilterDimensions: {
       Level: normalizeChallengeRating(r.challenge_rating),
-      Source: r.document__title,
-      Type: `${r.type}` + (r.subtype ? ` (${r.subtype})` : ``)
+      Source: r.document.display_name,
+      Type: `${r.type.name}`
     }
   };
   return listingMeta;
