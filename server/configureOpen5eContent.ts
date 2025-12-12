@@ -21,6 +21,12 @@ export async function configureOpen5eContent(
     return;
   }
 
+  if (process.env.OPEN5E_API_LIMIT) {
+    console.log(
+      `Using Open5e API limit from environment: ${process.env.OPEN5E_API_LIMIT}`
+    );
+  }
+
   const includeMonsterFields =
     "name,slug,size,type,subtype,alignment,challenge_rating,document__title,document__slug";
   const includeSpellFields =
@@ -77,6 +83,11 @@ async function getAllListings(
 ): Promise<Record<string, ListingsWithSourceTitle>> {
   let nextUrl = sourceUrl;
   const listingsBySource: Record<string, ListingsWithSourceTitle> = {};
+  const apiLimit = process.env.OPEN5E_API_LIMIT
+    ? parseInt(process.env.OPEN5E_API_LIMIT)
+    : null;
+  let totalLoaded = 0;
+
   do {
     console.log("Loading " + nextUrl);
     try {
@@ -85,6 +96,7 @@ async function getAllListings(
         response.data.results,
         r => r.document__slug as string
       );
+      totalLoaded += response.data.results.length;
 
       for (const slug in newListingsBySlug) {
         const listingMetas = newListingsBySlug[slug].map(createListingMeta);
@@ -102,7 +114,7 @@ async function getAllListings(
     } catch (e) {
       console.warn("Problem loading content", JSON.stringify(e));
     }
-  } while (nextUrl);
+  } while (nextUrl && (apiLimit === null || totalLoaded < apiLimit));
   console.log("Done.");
 
   return listingsBySource;
