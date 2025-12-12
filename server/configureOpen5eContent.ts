@@ -21,12 +21,18 @@ export async function configureOpen5eContent(
     return;
   }
 
+  if (process.env.OPEN5E_API_LIMIT) {
+    console.log(
+      `Using Open5e API limit from environment: ${process.env.OPEN5E_API_LIMIT}`
+    );
+  }
+
   const includeMonsterFields =
-    "name,slug,size,type,subtype,alignment,challenge_rating,document__title,document__slug";
+    "name,key,size,type,alignment,challenge_rating,document";
   const includeSpellFields =
     "name,slug,level,school,document__title,document__slug";
 
-  const monstersSourceUrl = `https://api.open5e.com/monsters/?limit=500&fields=${includeMonsterFields}`;
+  const monstersSourceUrl = `https://api.open5e.com/v2/creatures/?limit=500&fields=${includeMonsterFields}`;
   const spellsSourceUrl = `https://api.open5e.com/spells/?limit=500&fields=${includeSpellFields}`;
 
   console.log("Loading Open5e monsters");
@@ -77,14 +83,20 @@ async function getAllListings(
 ): Promise<Record<string, ListingsWithSourceTitle>> {
   let nextUrl = sourceUrl;
   const listingsBySource: Record<string, ListingsWithSourceTitle> = {};
+  const apiLimit = process.env.OPEN5E_API_LIMIT
+    ? parseInt(process.env.OPEN5E_API_LIMIT)
+    : null;
+  let totalLoaded = 0;
+
   do {
     console.log("Loading " + nextUrl);
     try {
       const response = await axios.get(nextUrl);
       const newListingsBySlug = _.groupBy(
         response.data.results,
-        r => r.document__slug as string
+        r => (r.document__slug as string) ?? (r.document.key as string)
       );
+      totalLoaded += response.data.results.length;
 
       for (const slug in newListingsBySlug) {
         const listingMetas = newListingsBySlug[slug].map(createListingMeta);
@@ -102,7 +114,7 @@ async function getAllListings(
     } catch (e) {
       console.warn("Problem loading content", JSON.stringify(e));
     }
-  } while (nextUrl);
+  } while (nextUrl && (apiLimit === null || totalLoaded < apiLimit));
   console.log("Done.");
 
   return listingsBySource;
@@ -110,18 +122,18 @@ async function getAllListings(
 
 function getMetaForMonster(r: any): ListingMeta {
   const listingMeta: ListingMeta = {
-    Id: "open5e-" + r.slug,
+    Id: "open5e-" + r.key,
     Name: r.name,
     Path: "",
-    Link: `https://api.open5e.com/monsters/${r.slug}`,
+    Link: `https://api.open5e.com/v2/creatures/${r.key}`,
     LastUpdateMs: 0,
-    SearchHint: `${r.name} ${r.type} ${r.subtype} ${r.alignment}`
+    SearchHint: `${r.name} ${r.type.name} ${r.alignment}`
       .toLocaleLowerCase()
       .replace(/[^\w\s]/g, ""),
     FilterDimensions: {
       Level: normalizeChallengeRating(r.challenge_rating),
-      Source: r.document__title,
-      Type: `${r.type}` + (r.subtype ? ` (${r.subtype})` : ``)
+      Source: r.document.display_name,
+      Type: `${r.type.name}`
     }
   };
   return listingMeta;

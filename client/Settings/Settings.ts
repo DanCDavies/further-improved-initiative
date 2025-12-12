@@ -41,6 +41,11 @@ export function UpdateSettings(oldSettings: any): Settings {
     updatedSettings.PreloadedStatBlockSources["tob3"] = true;
     delete updatedSettings.PreloadedContent.Open5eContent;
   }
+
+  if (_.get(oldSettings, "PreloadedStatBlockSources.wotc-srd")) {
+    updatedSettings.PreloadedStatBlockSources["srd-2024"] = true;
+  }
+  
   return updatedSettings;
 }
 
