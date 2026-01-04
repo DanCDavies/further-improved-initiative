@@ -167,6 +167,9 @@ export class StatBlockEditor extends React.Component<
       <>
         <div className="c-statblock-editor__headers">
           <TextField label="Portrait URL" fieldName="ImageURL" />
+          {api.errors.ImageURL && (
+            <p className="c-statblock-editor__error">{api.errors.ImageURL}</p>
+          )}
           <TextField label="Source" fieldName="Source" />
           <TextField label="Type" fieldName="Type" />
           {this.props.editorTarget == "persistentcharacter" && (
@@ -325,11 +328,26 @@ export class StatBlockEditor extends React.Component<
     (path: string, name: string) => JSON.stringify({ path, name })
   );
 
-  private validate = values => {
+  private validate = async values => {
     const errors: any = {};
 
     if (_.isEmpty(values.Name)) {
       errors.NameMissing = "Error: Name is required.";
+    }
+
+    if (!_.isEmpty(values.ImageURL)) {
+      try {
+        const url = new URL(values.ImageURL);
+        // attempt to create img element and load it to see if it's valid
+        await new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => resolve(true);
+          img.onerror = () => reject();
+          img.src = url.toString();
+        });
+      } catch {
+        errors.ImageURL = "Error: Portrait URL could not be loaded.";
+      }
     }
 
     if (this.state.editorMode === "json") {
