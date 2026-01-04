@@ -42,6 +42,11 @@ export class IdentityFields extends React.Component<IdentityFieldsProps> {
             <Field type="text" name="Name" id="name" autoComplete="off" />
           </div>
         </div>
+        {this.props.formApi.errors.NameMissing && (
+          <p className="c-statblock-editor__error">
+            {this.props.formApi.errors.NameMissing}
+          </p>
+        )}
         {showSaveAs && (
           <div className="c-statblock-editor__save-as">
             {this.props.allowSaveAsCopy && (
