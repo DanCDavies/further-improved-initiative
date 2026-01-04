@@ -28,7 +28,7 @@ export async function configureOpen5eContent(
   }
 
   const includeMonsterFields =
-    "name,key,size,type,alignment,challenge_rating,document";
+    "name,key,size,type,alignment,challenge_rating_text,document";
   const includeSpellFields =
     "name,slug,level,school,document__title,document__slug";
 
@@ -131,7 +131,7 @@ function getMetaForMonster(r: any): ListingMeta {
       .toLocaleLowerCase()
       .replace(/[^\w\s]/g, ""),
     FilterDimensions: {
-      Level: normalizeChallengeRating(r.challenge_rating),
+      Level: r.challenge_rating_text,
       Source: r.document.display_name,
       Type: `${r.type.name}`
     }
