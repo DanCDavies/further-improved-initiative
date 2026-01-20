@@ -68,22 +68,8 @@ const getClientOptions = (session: Express.Session) => {
     baseUrl,
     appVersion,
     googleAnalyticsId,
-    accountLevel: getAccountLevel(session)
   };
 };
-
-function getAccountLevel(session) {
-  if (!session.isLoggedIn) {
-    return "LoggedOut";
-  }
-  if (!session.hasStorage) {
-    return "LoggedInFree";
-  }
-  if (!session.hasEpicInitiative) {
-    return "AccountSync";
-  }
-  return "EpicInitiative";
-}
 
 export default async function (
   app: express.Application,
