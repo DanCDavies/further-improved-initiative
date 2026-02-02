@@ -4,6 +4,7 @@ export interface ClientEnvironment {
   IsLoggedIn: boolean;
   HasStorage: boolean;
   HasEpicInitiative: boolean;
+  HasMythic: boolean;
   BaseUrl: string;
   PatreonLoginUrl: string;
   SendMetrics: boolean;

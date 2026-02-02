@@ -53,6 +53,7 @@ const getClientOptions = (session: Express.Session) => {
     IsLoggedIn: session.isLoggedIn || false,
     HasStorage: session.hasStorage || false,
     HasEpicInitiative: session.hasEpicInitiative || false,
+    HasMythic: session.hasMythic || false,
     SendMetrics: process.env.METRICS_DB_CONNECTION_STRING != undefined,
     PostedEncounter: null,
     SentryDSN: process.env.SENTRY_DSN || null
@@ -67,7 +68,7 @@ const getClientOptions = (session: Express.Session) => {
     environmentJSON: JSON.stringify(environment),
     baseUrl,
     appVersion,
-    googleAnalyticsId,
+    googleAnalyticsId
   };
 };
 
@@ -185,6 +186,13 @@ async function setupLocalDefaultUser(session: Express.Session) {
     session.hasStorage = true;
     session.hasEpicInitiative = true;
     accountStatus = AccountStatus.Epic;
+  }
+
+  if (defaultAccountLevel === "mythic") {
+    session.hasStorage = true;
+    session.hasEpicInitiative = true;
+    session.hasMythic = true;
+    accountStatus = AccountStatus.Mythic;
   }
 
   session.isLoggedIn = true;

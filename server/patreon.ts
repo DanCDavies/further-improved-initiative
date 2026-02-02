@@ -26,6 +26,9 @@ const tiersWithAccountSyncEntitled = [
 
 const tiersWithEpicEntitled = ["1937132", "8749940"];
 
+// TODO: Replace with new Mythic tier ID when available
+const tiersWithMythicEntitled = ["8749940"];
+
 const baseUrl = process.env.BASE_URL;
 const patreonClientId = process.env.PATREON_CLIENT_ID;
 const patreonClientSecret = process.env.PATREON_CLIENT_SECRET;
@@ -172,21 +175,31 @@ function getUserAccountLevel(
   const hasEpicInitiative =
     hasEpicInitiativeSpecialGrant || hasEpicInitiativeReward;
 
-  const standing = hasEpicInitiative
-    ? AccountStatus.Epic
-    : hasStorageReward
-    ? AccountStatus.Pledge
-    : AccountStatus.None;
+  const hasMythicInitiativeReward =
+    _.intersection(rewardIds, tiersWithMythicEntitled).length > 0;
 
-  return standing;
+  if (hasMythicInitiativeReward) {
+    return AccountStatus.Mythic;
+  }
+
+  if (hasEpicInitiative) {
+    return AccountStatus.Epic;
+  }
+
+  if (hasStorageReward) {
+    return AccountStatus.Pledge;
+  }
+
+  return AccountStatus.None;
 }
 
 export function updateSessionAccountFeatures(
   session: Express.Session,
   standing: AccountStatus
 ): void {
-  session.hasStorage = standing == "pledge" || standing == "epic";
-  session.hasEpicInitiative = standing == "epic";
+  session.hasStorage = standing == "pledge" || standing == "epic" || standing == "mythic";
+  session.hasEpicInitiative = standing == "epic" || standing == "mythic";
+  session.hasMythic = standing == "mythic";
   session.isLoggedIn = true;
 }
 

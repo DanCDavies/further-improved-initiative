@@ -6,6 +6,7 @@ export const env: ClientEnvironment = {
   PostedEncounter: null,
   HasStorage: false,
   HasEpicInitiative: false,
+  HasMythic: false,
   IsLoggedIn: false,
   SendMetrics: false,
   BaseUrl: "",
