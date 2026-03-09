@@ -17,5 +17,6 @@ export interface User {
 export enum AccountStatus {
   None = "none",
   Pledge = "pledge",
-  Epic = "epic"
+  Epic = "epic",
+  Mythic = "mythic"
 }
