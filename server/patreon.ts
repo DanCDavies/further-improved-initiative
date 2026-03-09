@@ -21,13 +21,13 @@ const tiersWithAccountSyncEntitled = [
   "1322253", // deprecated: "Improved Initiative"
   "8750629", // "Account Sync"
   "1937132", // deprecated: "Epic Initiative"
-  "8749940" // "Epic Tier"
+  "8749940", // "Epic Tier"
+  "28096851" // "Mythic Tier"
 ];
 
-const tiersWithEpicEntitled = ["1937132", "8749940"];
+const tiersWithEpicEntitled = ["1937132", "8749940", "28096851"];
 
-// TODO: Replace with new Mythic tier ID when available
-const tiersWithMythicEntitled = ["8749940"];
+const tiersWithMythicEntitled = ["28096851"];
 
 const baseUrl = process.env.BASE_URL;
 const patreonClientId = process.env.PATREON_CLIENT_ID;
