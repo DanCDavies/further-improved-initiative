@@ -44,13 +44,17 @@ export default async function (
     "connection",
     function (socket: SocketIO.Socket & SocketWithSessionData) {
       function joinEncounter(id: string) {
+        const previousId = socket.handshake.session.encounterId;
+        if (previousId && previousId !== id) {
+          socket.leave(previousId);
+        }
         socket.handshake.session.encounterId = id;
         socket.join(id);
       }
 
       socket.on(
         "update encounter",
-        function (
+        async function (
           id: string,
           updatedEncounter: EncounterState<PlayerViewCombatantState>
         ) {
@@ -61,9 +65,36 @@ export default async function (
           joinEncounter(id);
           playerViews.UpdateEncounter(id, updatedEncounter);
 
+          if (updatedEncounter.ActiveCombatantId != null) {
+            await playerViews.SetActiveEncounter(id);
+            io.emit("active encounter changed", id);
+          } else {
+            const activeEncounter = await playerViews.GetActiveEncounter();
+            if (activeEncounter?.encounterId === id) {
+              await playerViews.ClearActiveEncounter(id);
+              io.emit("active encounter changed", null);
+            }
+          }
+
           socket.broadcast
             .to(id)
             .volatile.emit("encounter updated", updatedEncounter);
+        }
+      );
+
+      socket.on("end encounter", async function (id: string) {
+        const activeEncounter = await playerViews.GetActiveEncounter();
+        if (activeEncounter?.encounterId === id) {
+          await playerViews.ClearActiveEncounter(id);
+          io.emit("active encounter changed", null);
+        }
+      });
+
+      socket.on(
+        "get active encounter",
+        async function (callback: (encounterId: string | null) => void) {
+          const active = await playerViews.GetActiveEncounter();
+          callback(active?.encounterId || null);
         }
       );
 
@@ -84,6 +115,13 @@ export default async function (
 
       socket.on("join encounter", function (id: string) {
         joinEncounter(id);
+      });
+
+      socket.on("leave encounter", function (id: string) {
+        socket.leave(id);
+        if (socket.handshake.session.encounterId === id) {
+          socket.handshake.session.encounterId = undefined;
+        }
       });
 
       socket.on(

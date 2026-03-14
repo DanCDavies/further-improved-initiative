@@ -4,7 +4,9 @@ import { PlayerViewCombatantState } from "../common/PlayerViewCombatantState";
 import { PlayerViewState } from "../common/PlayerViewState";
 import { getDefaultSettings } from "../common/Settings";
 import { probablyUniqueString, ParseJSONOrDefault } from "../common/Toolbox";
-import { PlayerViewManager } from "./playerviewmanager";
+import { ActiveEncounterInfo, PlayerViewManager } from "./playerviewmanager";
+
+const ACTIVE_ENCOUNTER_KEY = "active_encounter";
 
 export class RedisPlayerViewManager implements PlayerViewManager {
   constructor(private redisClient: Redis) {}
@@ -60,5 +62,33 @@ export class RedisPlayerViewManager implements PlayerViewManager {
 
   public async Destroy(id: string): Promise<void> {
     this.redisClient.hdel(`playerviews_${id}`, "encounterState", "settings");
+  }
+
+  public async SetActiveEncounter(encounterId: string): Promise<void> {
+    await this.redisClient.hset(ACTIVE_ENCOUNTER_KEY, {
+      encounterId,
+      lastActivatedAt: Date.now().toString()
+    });
+  }
+
+  public async ClearActiveEncounter(encounterId: string): Promise<void> {
+    const current = await this.redisClient.hget(
+      ACTIVE_ENCOUNTER_KEY,
+      "encounterId"
+    );
+    if (current === encounterId) {
+      await this.redisClient.del(ACTIVE_ENCOUNTER_KEY);
+    }
+  }
+
+  public async GetActiveEncounter(): Promise<ActiveEncounterInfo | null> {
+    const fields = await this.redisClient.hgetall(ACTIVE_ENCOUNTER_KEY);
+    if (!fields.encounterId) {
+      return null;
+    }
+    return {
+      encounterId: fields.encounterId,
+      lastActivatedAt: parseInt(fields.lastActivatedAt, 10) || 0
+    };
   }
 }

@@ -123,6 +123,7 @@ export class EncounterCommander {
     }
 
     this.tracker.Encounter.EncounterFlow.EndEncounter();
+    this.tracker.PlayerViewClient.EndEncounter(env.EncounterId);
     this.tracker.EventLog.AddEvent("Encounter ended.");
     Metrics.TrackEvent("EncounterEnded", {
       Combatants: this.tracker.Encounter.Combatants().length
@@ -176,6 +177,7 @@ export class EncounterCommander {
   public ClearEncounter = (): boolean => {
     if (confirm("Remove all combatants and end encounter?")) {
       this.tracker.Encounter.ClearEncounter();
+      this.tracker.PlayerViewClient.EndEncounter(env.EncounterId);
       this.tracker.CombatantCommander.Deselect();
       this.tracker.EventLog.AddEvent("All combatants removed from encounter.");
       Metrics.TrackEvent("EncounterCleared");
@@ -191,6 +193,7 @@ export class EncounterCommander {
         .filter(c => !c.Combatant.IsPlayerCharacter());
       this.tracker.CombatantCommander.Deselect();
       this.tracker.Encounter.EncounterFlow.EndEncounter();
+      this.tracker.PlayerViewClient.EndEncounter(env.EncounterId);
       npcViewModels.forEach(vm =>
         this.tracker.Encounter.RemoveCombatant(vm.Combatant)
       );

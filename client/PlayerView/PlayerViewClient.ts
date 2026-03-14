@@ -31,6 +31,10 @@ export class PlayerViewClient {
     100
   );
 
+  public EndEncounter(encounterId: string) {
+    this.socket.emit("end encounter", encounterId);
+  }
+
   public UpdateSettings(
     encounterId: string,
     updatedSettings: PlayerViewSettings
