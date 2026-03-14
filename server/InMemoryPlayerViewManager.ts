@@ -3,12 +3,14 @@ import { PlayerViewCombatantState } from "../common/PlayerViewCombatantState";
 import { PlayerViewState } from "../common/PlayerViewState";
 import { getDefaultSettings } from "../common/Settings";
 import { probablyUniqueString } from "../common/Toolbox";
-import { PlayerViewManager } from "./playerviewmanager";
+import { ActiveEncounterInfo, PlayerViewManager } from "./playerviewmanager";
 
 export class InMemoryPlayerViewManager implements PlayerViewManager {
   private playerViews: {
     [encounterId: string]: PlayerViewState | undefined;
   } = {};
+
+  private activeEncounter: ActiveEncounterInfo | null = null;
 
   constructor() {}
 
@@ -55,5 +57,22 @@ export class InMemoryPlayerViewManager implements PlayerViewManager {
 
   public Destroy(id: string) {
     delete this.playerViews[id];
+  }
+
+  public async SetActiveEncounter(encounterId: string): Promise<void> {
+    this.activeEncounter = {
+      encounterId,
+      lastActivatedAt: Date.now()
+    };
+  }
+
+  public async ClearActiveEncounter(encounterId: string): Promise<void> {
+    if (this.activeEncounter?.encounterId === encounterId) {
+      this.activeEncounter = null;
+    }
+  }
+
+  public async GetActiveEncounter(): Promise<ActiveEncounterInfo | null> {
+    return this.activeEncounter;
   }
 }

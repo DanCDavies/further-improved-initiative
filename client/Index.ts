@@ -43,7 +43,7 @@ window.onload = async () => {
     Metrics.TrackLoad();
   }
 
-  if (document.getElementById("playerview")) {
+  if (document.getElementById("playerview") && !document.getElementById("kiosk__container")) {
     const encounterId = env.EncounterId;
     const container = document.getElementById("playerview__container");
     if (!container) {
@@ -55,6 +55,63 @@ window.onload = async () => {
       SocketIOClient.io({
         transports: ["websocket"]
       })
+    );
+  }
+
+  if (document.getElementById("kiosk__container")) {
+    const kioskContainer = document.getElementById("playerview__container")!;
+    const kioskIdle = document.getElementById("kiosk__idle")!;
+    const socket = SocketIOClient.io({ transports: ["websocket"] });
+    let currentPlayerView: ReactPlayerView | null = null;
+    let currentEncounterId: string | null = null;
+
+    const showIdle = () => {
+      kioskIdle.style.display = "";
+      kioskContainer.style.display = "none";
+    };
+
+    const showEncounter = () => {
+      kioskIdle.style.display = "none";
+      kioskContainer.style.display = "";
+    };
+
+    const joinEncounter = (encounterId: string) => {
+      if (currentPlayerView) {
+        currentPlayerView.Disconnect();
+      }
+      if (currentEncounterId) {
+        socket.emit("leave encounter", currentEncounterId);
+      }
+      currentEncounterId = encounterId;
+      currentPlayerView = new ReactPlayerView(kioskContainer, encounterId);
+      currentPlayerView.LoadEncounterFromServer();
+      currentPlayerView.ConnectToSocket(socket);
+      showEncounter();
+    }
+
+    socket.on("active encounter changed", (encounterId: string | null) => {
+      if (encounterId && encounterId !== currentEncounterId) {
+        joinEncounter(encounterId);
+      } else if (!encounterId) {
+        if (currentPlayerView) {
+          currentPlayerView.Disconnect();
+        }
+        currentEncounterId = null;
+        currentPlayerView = null;
+        showIdle();
+      }
+    });
+
+    // Check for an already-active encounter on load
+    socket.emit(
+      "get active encounter",
+      (encounterId: string | null) => {
+        if (encounterId) {
+          joinEncounter(encounterId);
+        } else {
+          showIdle();
+        }
+      }
     );
   }
 

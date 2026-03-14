@@ -86,6 +86,14 @@ export class ReactPlayerView {
     );
   }
 
+  public Disconnect() {
+    if (this.socket) {
+      this.socket.off("encounter updated");
+      this.socket.off("settings updated");
+      this.socket.off("combat stats");
+    }
+  }
+
   private suggestDamage = (combatantId: string, damageAmount: number) => {
     if (!this.socket) {
       throw "Player View not attached to socket";

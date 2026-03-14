@@ -2,6 +2,12 @@ import { PlayerViewState } from "../common/PlayerViewState";
 import { InMemoryPlayerViewManager } from "./InMemoryPlayerViewManager";
 import { RedisPlayerViewManager } from "./RedisPlayerViewManager";
 import Redis from "ioredis";
+
+export interface ActiveEncounterInfo {
+  encounterId: string;
+  lastActivatedAt: number;
+}
+
 export interface PlayerViewManager {
   Get(id: string): Promise<PlayerViewState>;
 
@@ -14,6 +20,12 @@ export interface PlayerViewManager {
   InitializeNew(): Promise<string>;
 
   Destroy(id: string): void;
+
+  SetActiveEncounter(encounterId: string): Promise<void>;
+
+  ClearActiveEncounter(encounterId: string): Promise<void>;
+
+  GetActiveEncounter(): Promise<ActiveEncounterInfo | null>;
 }
 
 let playerViewManager: PlayerViewManager | null = null;

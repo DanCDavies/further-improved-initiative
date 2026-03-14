@@ -4,8 +4,6 @@ import * as express from "express";
 import * as moment from "moment";
 
 import mustacheExpress = require("mustache-express");
-import { URL } from "url";
-
 import { ClientEnvironment } from "../common/ClientEnvironment";
 import { probablyUniqueString, ParseJSONOrDefault } from "../common/Toolbox";
 import { configureBasicRulesContent } from "./configureBasicRulesContent";
@@ -23,7 +21,6 @@ import configureStorageRoutes from "./storageroutes";
 import { AccountStatus } from "./user";
 import { configureOpen5eContent } from "./configureOpen5eContent";
 import { configureAffiliateRoutes } from "./configureAffiliateRoutes";
-import request = require("request");
 import { configureImportRoutes } from "./configureImportRoutes";
 
 const baseUrl = process.env.BASE_URL || "";
@@ -121,8 +118,9 @@ export default async function (
       throw "Session is not available";
     }
     session.encounterId = req.params.id;
-    const urlObject = new URL(req.url, baseUrl);
-    const queryString = urlObject.search;
+    const queryString = req.originalUrl.includes("?")
+      ? req.originalUrl.substring(req.originalUrl.indexOf("?"))
+      : "";
 
     res.redirect("/e/" + queryString);
   });
@@ -156,6 +154,18 @@ export default async function (
   app.get("/playerviews/:id", async (req: Req, res: Res) => {
     const playerView = await playerViews.Get(req.params.id);
     res.json(playerView);
+  });
+
+  app.get("/kiosk", (req: Req, res: Res) => {
+    res.render("kiosk", {
+      baseUrl,
+      appVersion
+    });
+  });
+
+  app.get("/api/active-encounter", async (req: Req, res: Res) => {
+    const active = await playerViews.GetActiveEncounter();
+    res.json({ encounterId: active?.encounterId || null });
   });
 
   configureBasicRulesContent(app);
